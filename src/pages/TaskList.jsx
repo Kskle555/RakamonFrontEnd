@@ -1,15 +1,29 @@
 import { useNavigate } from 'react-router-dom';
-
+import { useState,useEffect } from 'react';
+import api from './axiosConfig';
 function TaskList() {
+
+  const [tasks, setTasks] = useState([]);
+
+
     const navigate = useNavigate(); // Yönlendirme için hook
-    const tasks = [
-      { id: 1, title: 'Frontend Task', status: 'Tamamlanmadı' },
-      { id: 2, title: 'Backend Task', status: 'Tamamlandı' },
-    ];
   
+  
+    useEffect(() => {
+      // Görevleri çekme
+      const fetchTasks = async () => {
+        try {
+          const response = await api.get('/tasks');
+          setTasks(response.data);
+        } catch (error) {
+          console.error('Görevleri alırken bir hata oluştu:', error);
+        }
+      };
+  
+      fetchTasks();
+    }, []);
 
-
-    
+    console.log(tasks);
     return (
       <div className="p-6 bg-gray-50 min-h-screen">
         <div className="max-w-4xl mx-auto">
@@ -22,7 +36,9 @@ function TaskList() {
               >
                 <div>
                   <h3 className="font-bold text-lg">{task.title}</h3>
-                  <p className="text-gray-500">{task.status}</p>
+                  <p className={`text-sm ${task.isCompleted ? 'text-green-500 underline' : 'text-red-500 underline'}`}>
+                   {task.isCompleted ? 'Tamamlandı' : 'Tamamlanmadı'}
+                 </p>
                 </div>
                 <button
                 onClick={()=>navigate (`/tasks/${task.id}`)}

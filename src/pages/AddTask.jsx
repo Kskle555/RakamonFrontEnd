@@ -1,12 +1,43 @@
 import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import api from './axiosConfig';
 
 function AddTask() {
+
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Yeni Görev Eklendi');
-    navigate('/tasks'); // Ekledikten sonra Görev Listesi'ne yönlendirme
+    try {
+
+      if (!title || !description) {
+        alert('Lütfen tüm alanları doldurunuz!');
+        return;
+      }
+
+      if (title.length < 3) {
+        alert('Başlık en az 3 karakter olmalıdır!');
+        return;
+      }
+
+      if (description.length < 10) {
+        alert('Açıklama en az 10 karakter olmalıdır!');
+        return;
+      }
+      
+      const newTask = { title, description, status: 'Tamamlanmadı' };
+      await api.post('/tasks', newTask);
+      alert('Yeni görev başarıyla eklendi!');
+      setTitle('');
+      setDescription('');
+    } catch (error) {
+      console.error('Görev eklenirken bir hata oluştu:', error);
+      alert ('Görev eklenirken bir hata oluştu:', error);
+    }
   };
 
   return (
@@ -18,7 +49,9 @@ function AddTask() {
             <label className="block text-gray-700">Başlık</label>
             <input
               type="text"
+              value={title}
               placeholder="Görev Başlığı"
+              onChange={(e) => setTitle(e.target.value)}
               className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
           </div>
@@ -26,6 +59,8 @@ function AddTask() {
             <label className="block text-gray-700">Açıklama</label>
             <textarea
               placeholder="Görev Açıklaması"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
               className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
             ></textarea>
           </div>

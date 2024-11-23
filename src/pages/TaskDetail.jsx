@@ -1,27 +1,74 @@
 import { useParams, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import api from './axiosConfig';
 
 function TaskDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const task = {
-    id,
-    title: 'Frontend Task',
-    description: 'React ve TailwindCSS kullanılarak görev yönetim uygulaması geliştirilecek.',
-    status: 'Tamamlanmadı',
-  };
+  // State'ler ile form verilerini tutuyoruz
+  const [task, setTask] = useState({
+    title: '',
+    description: '',
+    isCompleted: false, // true ya da false olacak  
+  });
 
-  const handleUpdate = (e) => {
+  // ID'ye göre görevi alıyoruz
+  useEffect(() => {
+    const fetchTask = async () => {
+      try {
+        const response = await api.get(`/tasks/${id}`);
+        setTask(response.data); // Alınan veriyi state'e kaydediyoruz
+      } catch (error) {
+        console.error('Görev alınırken bir hata oluştu:', error);
+      }
+    };
+
+    fetchTask();
+  }, [id]);
+
+  // Güncelleme işlemi
+  const handleUpdate = async (e) => {
     e.preventDefault();
-    console.log('Görev Güncellendi');
-    navigate('/tasks'); // Güncellemeden sonra Görev Listesi'ne yönlendirme
+    try {
+      if (!task.title || !task.description) {
+        alert('Lütfen tüm alanları doldurunuz!');
+        return;
+      }
+
+      if (task.title.length < 3) {
+        alert('Başlık en az 3 karakter olmalıdır!');
+        return;
+      }
+      if (task.description.length < 10) {
+        alert('Açıklama en az 10 karakter olmalıdır!');
+        return;
+      }
+      
+      const updatedTask = {
+        ...task, // mevcut verileri alıyoruz
+      };
+      // PUT isteği gönderiyoruz
+      await api.put(`/tasks/${id}`, updatedTask);
+      alert('Görev başarıyla güncellendi!');
+      navigate('/tasks'); // Güncellemeyi tamamladıktan sonra görev listesine yönlendiriyoruz
+    } catch (error) {
+      console.error('Görev güncellenirken bir hata oluştu:', error);
+    }
   };
 
-  const handleDelete = () => {
-    console.log('Görev Silindi');
-    navigate('/tasks'); // Silmeden sonra Görev Listesi'ne yönlendirme
+  // Silme işlemi
+  const handleDelete = async () => {
+    try {
+      await api.delete(`/tasks/${id}`);
+      alert('Görev başarıyla silindi!');
+      navigate('/tasks'); // Silme işlemi sonrası görev listesine yönlendiriyoruz
+    } catch (error) {
+      console.error('Görev silinirken bir hata oluştu:', error);
+    }
   };
 
+  // Formu render ediyoruz
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="max-w-4xl mx-auto bg-white p-6 shadow rounded">
@@ -31,21 +78,29 @@ function TaskDetail() {
             <label className="block text-gray-700">Başlık</label>
             <input
               type="text"
-              defaultValue={task.title}
+              value={task.title}
+              onChange={(e) => setTask({ ...task, title: e.target.value })}
               className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
           </div>
           <div className="mb-4">
             <label className="block text-gray-700">Açıklama</label>
             <textarea
-              defaultValue={task.description}
+              value={task.description}
+              onChange={(e) => setTask({ ...task, description: e.target.value })}
               className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
             ></textarea>
           </div>
           <div className="mb-4">
             <label className="block text-gray-700">Durum</label>
             <select
-              defaultValue={task.status}
+              value={task.isCompleted ? 'Tamamlandı' : 'Tamamlanmadı'} // boolean değeri string'e çeviriyoruz
+              onChange={(e) =>
+                setTask({
+                  ...task,
+                  isCompleted: e.target.value === 'Tamamlandı', // true/false dönüşümü
+                })
+              }
               className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
             >
               <option value="Tamamlanmadı">Tamamlanmadı</option>
