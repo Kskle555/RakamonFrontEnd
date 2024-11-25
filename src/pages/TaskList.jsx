@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useState,useEffect } from 'react';
 import api from './axiosConfig';
+import axios from 'axios';
 function TaskList() {
 
   const [tasks, setTasks] = useState([]);
@@ -13,13 +14,18 @@ function TaskList() {
       // Görevleri çekme
       const fetchTasks = async () => {
         try {
-          const response = await api.get('/tasks');
-          setTasks(response.data);
+            const token = localStorage.getItem("authToken"); // Token'ı localStorage'dan alın
+            const response = await axios.get("https://localhost:7124/api/tasks", {
+                headers: {
+                    Authorization: `Bearer ${token}`, // Bearer ile birlikte token gönderin
+                },
+            });
+            console.log("Görevler:", response.data);
+            setTasks(response.data)
         } catch (error) {
-          console.error('Görevleri alırken bir hata oluştu:', error);
-          
+            console.error("Görevleri alırken bir hata oluştu:", error);
         }
-      };
+    };
   
       fetchTasks();
     }, []);

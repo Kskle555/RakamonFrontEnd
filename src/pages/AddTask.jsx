@@ -10,6 +10,26 @@ function AddTask() {
   const [selectedUserId, setSelectedUserId] = useState(''); // Seçilen kullanıcı ID'si
   const navigate = useNavigate();
 
+
+  const getUserFromToken = () => {
+    const token = localStorage.getItem('authToken');
+    if (!token) return null;
+  
+    try {
+      // JWT'nin payload kısmını çözümle
+      const payload = JSON.parse(atob(token.split('.')[1]));
+  
+      // Kullanıcı ID'sini doğru alandan oku
+      const userId = payload["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
+      console.log("Token'dan alınan kullanıcı ID'si:", userId);
+  
+      return userId;
+    } catch (e) {
+      console.error('Token çözümlemesi sırasında hata:', e);
+      return null;
+    }
+  };
+
   useEffect(() => {
     // LocalStorage'den kullanıcı rolünü alıyoruz
     const userRole = localStorage.getItem('userRole');
@@ -49,28 +69,45 @@ function AddTask() {
       }
 
       const newTask = { title, description, status: 'Tamamlanmadı' };
-
+      const userId = getUserFromToken(); // Kullanıcı bilgisi alınıyor
       // Kullanıcı rolüne göre işlem yapma
-      if (role !== 'admin') {
-        const userId = localStorage.getItem('userId');
-        newTask.userId = userId; // Eğer normal kullanıcı ise, sadece kendi ID'sini atıyoruz
+
+      if (userId == null || userId == undefined) {
+        console.error('Tokenden Kullanıcı ID alınamadı! işlem yaptirma');
+        return;
+
+      }
+      if (role != null) {
+        
+        newTask.userId = selectedUserId; // Eğer normal kullanıcı ise, sadece kendi ID'sini atıyoruz
+   
       } else {
         // Admin ise, seçilen kullanıcıyı görevle ilişkilendiriyoruz
         if (selectedUserId) {
           newTask.userId = selectedUserId; // Göreve seçilen kullanıcıyı atıyoruz
+        
         }
       }
 
       await api.post('/tasks', newTask);
       alert('Yeni görev başarıyla eklendi!');
+
+      //görev eklendi task sayfasina yonlendi
+      navigate('/tasks');
       setTitle('');
       setDescription('');
       setSelectedUserId(''); // Seçilen kullanıcıyı sıfırlıyoruz
     } catch (error) {
-      console.error('Görev eklenirken bir hata oluştu:', error);
-      alert('Görev eklenirken bir hata oluştu!');
+      if (error.response && error.response.data.errors) {
+        console.log('Validasyon hatası:', error.response.data.errors);
+        alert(JSON.stringify(error.response.data.errors));
+      } else {
+        console.error('Görev güncellenirken bir hata oluştu:', error);
+      }
     }
   };
+
+  console.log(selectedUserId,"id");
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
@@ -107,7 +144,7 @@ function AddTask() {
             </select>
           </div>
 
-          {users.filter(user => user.role === 'admin').length > 0 && (
+          {users.filter(user => user.role !=null).length > 0 && (
   <div className="mb-4">
     <label className="block text-gray-700">Kullanıcı Seç</label>
     <select
@@ -116,7 +153,7 @@ function AddTask() {
       className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
     >
       <option value="">Bir kullanıcı seçin</option>
-      {users.filter(user => user.role === 'admin').map((user) => (
+      {users.filter(user => user.role != null).map((user) => (
         <option key={user.id} value={user.id}>
           {user.name} 
         </option>

@@ -3,6 +3,30 @@ import { useState, useEffect } from 'react';
 import api from './axiosConfig';
 
 function TaskDetail() {
+
+  const getUserFromToken = () => {
+    const token = localStorage.getItem('authToken');
+    if (!token) return null;
+  
+    try {
+      // JWT'nin payload kısmını çözümle
+      const payload = JSON.parse(atob(token.split('.')[1]));
+  
+      // Kullanıcı ID'sini doğru alandan oku
+      const userId = payload["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
+      console.log("Token'dan alınan kullanıcı ID'si:", userId);
+  
+      return userId;
+    } catch (e) {
+      console.error('Token çözümlemesi sırasında hata:', e);
+      return null;
+    }
+  };
+  
+  
+
+
+
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -31,6 +55,13 @@ function TaskDetail() {
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
+
+      const userId = getUserFromToken(); // Kullanıcı bilgisi alınıyor
+   
+    //  if (!userId) {
+    //  console.error('Kullanıcı ID alınamadı!');
+    //     return;
+    //     }
       if (!task.title || !task.description) {
         alert('Lütfen tüm alanları doldurunuz!');
         return;
@@ -46,14 +77,27 @@ function TaskDetail() {
       }
       
       const updatedTask = {
-        ...task, // mevcut verileri alıyoruz
+        id, // URL'deki görev ID'si
+        title: task.title,
+        description: task.description,
+        isCompleted: task.isCompleted,
+        userId: userId, // Kullanıcı ID'sini ekle
       };
+  
+      console.log("Gönderilen veri:", updatedTask);
+      
+
       // PUT isteği gönderiyoruz
       await api.put(`/tasks/${id}`, updatedTask);
       alert('Görev başarıyla güncellendi!');
       navigate('/tasks'); // Güncellemeyi tamamladıktan sonra görev listesine yönlendiriyoruz
     } catch (error) {
-      console.error('Görev güncellenirken bir hata oluştu:', error);
+      if (error.response && error.response.data.errors) {
+        console.log('Validasyon hatası:', error.response.data.errors);
+        alert(JSON.stringify(error.response.data.errors));
+      } else {
+        console.error('Görev güncellenirken bir hata oluştu:', error);
+      }
     }
   };
 
