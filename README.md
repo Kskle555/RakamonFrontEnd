@@ -79,3 +79,14 @@ Kullanıcılar, TC Kimlik No, şifre ve rollerini seçerek sisteme kayıt olabil
 
 3️⃣ Görev Yönetim Paneli
 Kullanıcılar rollerine göre görevlerini görüntüleyebilir veya düzenleyebilir.
+
+
+
+
+
+
+📝 Katkıda Bulunma
+Katkıda bulunmak isterseniz lütfen bir Pull Request gönderin. Daha fazla bilgi için CONTRIBUTING.md dosyasına göz atabilirsiniz.
+
+📄 Lisans
+Bu proje MIT Lisansı ile lisanslanmıştır.
