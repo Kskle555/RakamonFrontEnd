@@ -17,7 +17,7 @@ function Register() {
 
     try {
       // API'ye kullanıcı kaydı için istek gönderiyoruz
-      const response = await api.post("https://localhost:7124/api/Users", {
+      const response = await api.post("https://oguzhanbilgi.com/api/Users", {
         id: 0, // Yeni kullanıcı için id'yi 0 olarak gönderiyoruz (API bunu  otomatik olarak atacak)
         name, // Kullanıcı adı
         email, // Kullanıcı email

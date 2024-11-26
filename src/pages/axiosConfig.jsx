@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://localhost:7124/api", // API base URL
+  baseURL: "https://oguzhanbilgi.com/api", // API base URL
 });
 
 // Token'ı header'a ekleme
