@@ -14,7 +14,7 @@ const PrivateRoute = ({ allowedRoles }) => {
       console.log("Decoded Token:", decodedToken);
   
       // Kullanıcı rolünü alın
-      const userRole = decodedToken["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+      const userRole = decodedToken["https://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
       console.log("User Role:", userRole);
   
       // Kullanıcının rolü izin verilen rollerde değilse, login sayfasına yönlendir
