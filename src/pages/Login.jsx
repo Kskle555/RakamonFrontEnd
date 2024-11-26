@@ -12,7 +12,7 @@ function Login() {
     e.preventDefault();
   
     try {
-      const response = await api.post("https://localhost:7124/api/auth/login", {
+      const response = await api.post("https://oguzhanbilgi.com/api/auth/login", {
         tcKimlikNo,
         password,
       });
