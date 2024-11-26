@@ -15,7 +15,7 @@ function TaskList() {
       const fetchTasks = async () => {
         try {
             const token = localStorage.getItem("authToken"); // Token'ı localStorage'dan alın
-            const response = await axios.get("https://localhost:7124/api/tasks", {
+            const response = await axios.get("https://oguzhanbilgi.com/api/tasks", {
                 headers: {
                     Authorization: `Bearer ${token}`, // Bearer ile birlikte token gönderin
                 },
