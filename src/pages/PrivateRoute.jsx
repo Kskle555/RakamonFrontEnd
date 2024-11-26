@@ -18,10 +18,10 @@ const PrivateRoute = ({ allowedRoles }) => {
       console.log("User Role:", userRole);
   
       // Kullanıcının rolü izin verilen rollerde değilse, login sayfasına yönlendir
-      if (!allowedRoles.includes(userRole)) {
-        alert("Bu sayfaya erişim izniniz yok.");
-        return <Navigate to="/" />;
-      }
+      // if (!allowedRoles.includes(userRole)) {
+      //   alert("Bu sayfaya erişim izniniz yok.");
+      //   return <Navigate to="/" />;
+      // }
     } catch (error) {
       console.error("Token çözümleme hatası:", error);
       return <Navigate to="/" />;
