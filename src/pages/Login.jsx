@@ -42,6 +42,8 @@ function Login() {
     } catch (error) {
       console.error("API Hatası:", error.response || error);
       setErrorMessage(error.response?.data?.message || "Giriş başarısız. Sunucu hatası!");
+      alert("API Hatası:", error.response || error)
+      alert(error.response?.data?.message)
     }
   };
   
